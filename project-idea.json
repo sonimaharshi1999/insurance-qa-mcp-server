@@ -1,0 +1,12 @@
+{
+  "project_name": "insurance-qa-mcp-server",
+  "title": "Insurance QA MCP Server - Model Context Protocol for QA Automation",
+  "category": "mcp",
+  "difficulty": "advanced",
+  "description": "An MCP (Model Context Protocol) server that extends AI assistants with QA automation tools for insurance domains. 10 tools for test execution, data generation, code analysis, and insurance validation. 4 resources for project scanning and domain knowledge. 3 prompt templates. Built with the official MCP Python SDK.",
+  "tech_stack": ["mcp", "pydantic", "click", "pytest", "pandas", "numpy", "fastapi"],
+  "features": ["10 MCP tools: run_tests, generate_test_data, lint_code, validate_claim, validate_policy, find_flaky_tests, analyze_coverage, suggest_tests, check_test_health, generate_bdd_scenarios", "4 MCP resources: projects list, coverage data, insurance lines, test patterns", "3 MCP prompts: review failures, plan test strategy, triage bug", "Full Claude Code ecosystem: CLAUDE.md, hooks, skills, agents, commands, rules", "P&C insurance domain validation for 8 lines of business"],
+  "test_status": "PASSED",
+  "sample_input": {"description": "MCP tool call", "example": "Tool: validate_claim({\"lob\": \"PersonalAuto\", \"loss_amount\": 15000, \"status\": \"open\"})"},
+  "sample_output": {"description": "Validation results", "example": "{\"valid\": true, \"warnings\": [\"loss_amount near threshold for SIU review\"]}"}
+}

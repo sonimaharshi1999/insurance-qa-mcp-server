@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pytest*)",
+      "Bash(python -m insurance_qa_mcp*)",
+      "Bash(pip install*)",
+      "Bash(ruff check*)",
+      "Read(**/src/**)",
+      "Read(**/tests/**)",
+      "Edit(**/src/**)",
+      "Edit(**/tests/**)"
+    ],
+    "deny": []
+  }
+}
