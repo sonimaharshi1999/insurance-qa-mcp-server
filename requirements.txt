@@ -1,0 +1,10 @@
+# Core dependencies (also in pyproject.toml)
+mcp>=1.0.0
+pydantic>=2.0.0
+click>=8.0.0
+
+# Optional bridge dependencies (install from git for portability)
+# For local development, use: pip install -e /path/to/local/repo
+testpilot-ai @ git+https://github.com/sonimaharshi1999/testpilot-ai.git
+promptguard-py @ git+https://github.com/sonimaharshi1999/promptguard.git
+embedkit-py @ git+https://github.com/sonimaharshi1999/embedkit.git

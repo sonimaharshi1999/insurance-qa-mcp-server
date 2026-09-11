@@ -2,7 +2,7 @@
 
 ![Tests](https://github.com/sonimaharshi1999/insurance-qa-mcp-server/actions/workflows/test.yml/badge.svg) ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
 
-> An MCP (Model Context Protocol) server that gives AI assistants like Claude superpowers for QA automation in insurance domains. Provides tools for test execution, synthetic data generation, code quality analysis, coverage reporting, and insurance business-rule validation.
+> An MCP (Model Context Protocol) server that gives AI assistants like Claude superpowers for QA automation in insurance domains. Provides 24 tools for test execution, synthetic data generation, code quality analysis, coverage reporting, insurance business-rule validation, Playwright test generation, multi-agent code review, semantic search, chaos testing, mock enterprise connectors (ADO, Zephyr, SQL), and a natural-language QA workflow orchestrator -- integrating 6 external projects as MCP tool bridges.
 
 Built with the official [MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk) using the FastMCP high-level API.
 
@@ -15,6 +15,51 @@ After 5 years of QA automation at PwC across Guidewire InsuranceSuite implementa
 MCP (Model Context Protocol) is Anthropic's open standard that solves exactly this problem. It lets AI assistants connect to external tools and data sources through a standardized protocol. Instead of copy-pasting test results into a chat window, Claude can directly run your tests, generate synthetic claims data, validate business rules, and plan test strategies -- all through a structured, type-safe interface.
 
 This project bridges my insurance QA expertise with the Claude ecosystem, demonstrating how domain-specific MCP servers turn a general-purpose AI into a specialized QA copilot. Every tool in this server encodes real P&C insurance knowledge: premium ranges, claim validation rules, Guidewire conventions, and industry-standard test patterns.
+
+---
+
+## System Architecture
+
+```mermaid
+graph TB
+    QA[QA Engineer] -->|Natural Language| CC[Claude Code Agent Runtime]
+    CC --> SS[Skill Selection]
+    SS --> CG[Context Gathering]
+    CG --> ADO[ADO/Jira Connector]
+    CG --> KB[Knowledge Base - EmbedKit]
+    CG --> REPO[Code Repository]
+    CG --> SM[Semantic Retrieval]
+    CG --> CA[Context Assembly]
+    CA --> CI[Claude Inference]
+    CI --> TS[Tool Selection]
+    TS --> PW[Playwright Bridge]
+    TS --> CR[Code Review Bridge]
+    TS --> TG[TestPilot Bridge]
+    TS --> CT[Chaos Tester Bridge]
+    TS --> ZP[Zephyr Connector]
+    TS --> SQL[SQL Connector]
+    TS --> TE[Tool Execution]
+    TE --> OB[Observation]
+    OB --> CRA[Context Re-assembly]
+    CRA --> CI
+```
+
+---
+
+## Connected Projects
+
+This MCP server integrates with 6 external projects as tool bridges:
+
+| Project | Bridge | MCP Tools |
+|---------|--------|-----------|
+| [playwright-ai-test-generator](https://github.com/sonimaharshi1999/playwright-ai-test-generator) | `playwright_bridge.py` | `generate_playwright_tests`, `run_playwright_audit` |
+| [multi-agent-code-reviewer](https://github.com/sonimaharshi1999/multi-agent-code-reviewer) | `code_review_bridge.py` | `review_code` |
+| [testpilot-ai](https://github.com/sonimaharshi1999/testpilot-ai) | `test_gen_bridge.py` | `auto_generate_tests` |
+| [embedkit](https://github.com/sonimaharshi1999/embedkit) | `embedkit_bridge.py` | `semantic_search` |
+| [api-chaos-tester](https://github.com/sonimaharshi1999/api-chaos-tester) | `chaos_test_bridge.py` | `chaos_test_api` |
+| [promptguard](https://github.com/sonimaharshi1999/promptguard) | _(security layer)_ | _(prompt validation)_ |
+
+All bridges work **without** their external packages installed via graceful fallback implementations (AST analysis, TF-IDF search, mock generation).
 
 ---
 
@@ -33,7 +78,7 @@ graph TB
     subgraph "Insurance QA MCP Server"
         SERVER[FastMCP Server]
 
-        subgraph "Tools (10)"
+        subgraph "Core Tools (10)"
             T1[run_tests]
             T2[generate_test_data]
             T3[analyze_coverage]
@@ -46,11 +91,33 @@ graph TB
             T10[suggest_tests]
         end
 
-        subgraph "Resources (4)"
+        subgraph "Bridge Tools (7)"
+            B1[generate_playwright_tests]
+            B2[run_playwright_audit]
+            B3[review_code]
+            B4[auto_generate_tests]
+            B5[semantic_search]
+            B6[chaos_test_api]
+            B7[run_qa_workflow]
+        end
+
+        subgraph "Connector Tools (6)"
+            C1[get_user_stories]
+            C2[get_test_plan]
+            C3[get_test_cycles]
+            C4[update_test_result]
+            C5[query_test_data]
+            C6[validate_data_integrity]
+        end
+
+        subgraph "Resources (7)"
             R1["qa://projects"]
             R2["qa://coverage/{project}"]
             R3["qa://insurance/lines"]
             R4["qa://test-patterns"]
+            R5["qa://knowledge-base"]
+            R6["qa://ado/stories"]
+            R7["qa://zephyr/cycles"]
         end
 
         subgraph "Prompts (3)"
@@ -69,7 +136,9 @@ graph TB
     CC -->|JSON-RPC over stdio| STDIO
     STDIO --> SERVER
     SERVER --> T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8 & T9 & T10
-    SERVER --> R1 & R2 & R3 & R4
+    SERVER --> B1 & B2 & B3 & B4 & B5 & B6 & B7
+    SERVER --> C1 & C2 & C3 & C4 & C5 & C6
+    SERVER --> R1 & R2 & R3 & R4 & R5 & R6 & R7
     SERVER --> P1 & P2 & P3
     T6 & T7 --> V
     T2 --> D
@@ -125,7 +194,7 @@ Add this to your Claude Code MCP configuration (`~/.claude/settings.json` or pro
 }
 ```
 
-Once connected, Claude Code can use all 10 tools, read all 4 resources, and invoke all 3 prompt templates directly during your conversation.
+Once connected, Claude Code can use all 24 tools, read all 7 resources, and invoke all 3 prompt templates directly during your conversation.
 
 **Example usage in Claude Code:**
 
@@ -197,6 +266,78 @@ Analyze source code and suggest missing test cases.
 - **Parameters**: `file_path` (str)
 - **Returns**: Suggestions based on branches, error handling, loops, and function complexity
 
+### 11. `generate_playwright_tests`
+Generate Playwright test scripts from natural language workflow descriptions.
+- **Parameters**: `url` (str), `workflow` (str)
+- **Returns**: Complete Playwright Python test code, page objects, and detected steps
+- **Bridge**: [playwright-ai-test-generator](https://github.com/sonimaharshi1999/playwright-ai-test-generator)
+
+### 12. `run_playwright_audit`
+Run accessibility and performance audit concepts on a URL.
+- **Parameters**: `url` (str)
+- **Returns**: Accessibility findings (WCAG), performance metrics, and recommendations
+
+### 13. `review_code`
+Run multi-agent code review with security, performance, and style agents.
+- **Parameters**: `file_path` (str), `profile` (str: "standard", "strict", "security")
+- **Returns**: Findings per agent, severity summary, and overall rating
+- **Bridge**: [multi-agent-code-reviewer](https://github.com/sonimaharshi1999/multi-agent-code-reviewer)
+
+### 14. `auto_generate_tests`
+Analyze Python source and generate test cases automatically.
+- **Parameters**: `source_path` (str)
+- **Returns**: Generated test code with branch, error, and class coverage
+- **Bridge**: [testpilot-ai](https://github.com/sonimaharshi1999/testpilot-ai)
+
+### 15. `semantic_search`
+Search documents using semantic similarity (embeddings or TF-IDF fallback).
+- **Parameters**: `query` (str), `documents_dir` (str)
+- **Returns**: Ranked results with scores and snippets
+- **Bridge**: [embedkit](https://github.com/sonimaharshi1999/embedkit)
+
+### 16. `chaos_test_api`
+Generate chaos test scenarios from an OpenAPI specification.
+- **Parameters**: `spec_path` (str), `base_url` (str, optional)
+- **Returns**: Boundary value, type confusion, header injection, and body chaos scenarios
+- **Bridge**: [api-chaos-tester](https://github.com/sonimaharshi1999/api-chaos-tester)
+
+### 17. `get_user_stories`
+Get user stories with acceptance criteria from ADO/Jira (mock).
+- **Parameters**: `project` (str), `sprint` (str)
+- **Returns**: Insurance domain stories with acceptance criteria for PolicyCenter, ClaimCenter, BillingCenter
+
+### 18. `get_test_plan`
+Get a test plan linked to a user story (mock).
+- **Parameters**: `story_id` (str)
+- **Returns**: Test plan with linked test cases, priorities, and status
+
+### 19. `get_test_cycles`
+Get current test cycles from Zephyr test management (mock).
+- **Parameters**: `project` (str)
+- **Returns**: Test cycles with pass/fail/blocked counts and environments
+
+### 20. `update_test_result`
+Update test execution result in Zephyr (mock).
+- **Parameters**: `test_id` (str), `status` (str), `notes` (str)
+- **Returns**: Confirmation with execution ID
+
+### 21. `query_test_data`
+Query insurance test data from mock SQL Server database.
+- **Parameters**: `table` (str), `filters` (str)
+- **Returns**: Rows from cc_claim, pc_policy, or bc_billing with schema info
+- **Tables**: ClaimCenter claims, PolicyCenter policies, BillingCenter billing accounts
+
+### 22. `validate_data_integrity`
+Run data quality checks on a mock database table.
+- **Parameters**: `table` (str)
+- **Returns**: Null checks, duplicate detection, and business rule validations
+
+### 23. `run_qa_workflow`
+Take a natural language QA request and chain multiple tools together.
+- **Parameters**: `request` (str)
+- **Returns**: Detected workflow, execution plan with steps, and suggested arguments
+- **Workflows**: story-to-tests, code review pipeline, chaos testing, regression analysis, data validation, BDD workflow, full QA pipeline
+
 ---
 
 ## Resources Reference
@@ -207,6 +348,9 @@ Analyze source code and suggest missing test cases.
 | `qa://coverage/{project}` | Coverage data for a specific project path |
 | `qa://insurance/lines` | All 8 insurance LOBs with Guidewire names, coverage types, and premium ranges |
 | `qa://test-patterns` | Reusable QA test patterns: policy lifecycle, FNOL validation, premium boundaries, status transitions, coverage limits, data migration |
+| `qa://knowledge-base` | Available indexed documents in the semantic search knowledge base |
+| `qa://ado/stories` | List of available ADO/Jira user stories across all sprints |
+| `qa://zephyr/cycles` | Current test cycles across PolicyCenter, ClaimCenter, and BillingCenter |
 
 ---
 
@@ -297,9 +441,10 @@ insurance-qa-mcp-server/
   src/insurance_qa_mcp/
     __init__.py                   # Package version and metadata
     __main__.py                   # Entry point: python -m insurance_qa_mcp
-    server.py                     # FastMCP server with all registrations
+    server.py                     # FastMCP server with all registrations (24 tools, 7 resources, 3 prompts)
     models.py                     # Pydantic models (claims, policies, results)
     config.py                     # Server configuration
+    orchestrator.py               # Natural-language QA workflow orchestrator
     tools/
       __init__.py
       test_runner.py              # run_tests, find_flaky_tests, check_test_health
@@ -307,6 +452,18 @@ insurance-qa-mcp-server/
       code_analyzer.py            # lint_code, analyze_coverage, suggest_tests
       validators.py               # validate_claim, validate_policy
       bdd_generator.py            # generate_bdd_scenarios
+      bridges/
+        __init__.py
+        playwright_bridge.py      # generate_playwright_tests, run_playwright_audit
+        code_review_bridge.py     # review_code (security, performance, style agents)
+        test_gen_bridge.py        # auto_generate_tests (testpilot fallback)
+        embedkit_bridge.py        # semantic_search (embedkit / TF-IDF fallback)
+        chaos_test_bridge.py      # chaos_test_api (boundary, type confusion, injection)
+    connectors/
+      __init__.py
+      ado_connector.py            # get_user_stories, get_test_plan (mock ADO/Jira)
+      zephyr_connector.py         # get_test_cycles, update_test_result (mock Zephyr)
+      sql_connector.py            # query_test_data, validate_data_integrity (mock SQL)
     resources/
       __init__.py
       project_scanner.py          # Scan directories for projects
@@ -321,6 +478,9 @@ insurance-qa-mcp-server/
     test_data_generator.py        # Data generation tests
     test_tools.py                 # Code analysis, BDD, health check tests
     test_resources.py             # Resource provider tests
+    test_bridges.py               # Bridge tool tests (Playwright, CodeReview, TestGen, EmbedKit, Chaos)
+    test_connectors.py            # Connector tests (ADO, Zephyr, SQL)
+    test_orchestrator.py          # Workflow orchestrator tests
 ```
 
 ---
@@ -383,6 +543,8 @@ The server uses no external APIs, no database connections, and no network calls.
 | CLI Entry Point | Click |
 | Test Framework | pytest |
 | Code Analysis | Python `ast` module |
+| Semantic Search | TF-IDF (built-in) / EmbedKit (optional) |
+| Test Generation | AST analysis (built-in) / TestPilot (optional) |
 | CI/CD | GitHub Actions |
 | Language | Python 3.10+ |
 

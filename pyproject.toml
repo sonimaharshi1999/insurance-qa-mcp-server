@@ -40,6 +40,11 @@ analytics = [
     "pandas>=2.0.0",
     "numpy>=1.24.0",
 ]
+bridges = [
+    "testpilot-ai @ git+https://github.com/sonimaharshi1999/testpilot-ai.git",
+    "promptguard-py @ git+https://github.com/sonimaharshi1999/promptguard.git",
+    "embedkit-py @ git+https://github.com/sonimaharshi1999/embedkit.git",
+]
 
 [project.scripts]
 insurance-qa-mcp = "insurance_qa_mcp.server:main"
