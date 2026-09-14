@@ -1,6 +1,7 @@
 # Insurance QA MCP Server
 
-![Tests](https://github.com/sonimaharshi1999/insurance-qa-mcp-server/actions/workflows/test.yml/badge.svg) ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Tests](https://github.com/sonimaharshi1999/insurance-qa-mcp-server/actions/workflows/test.yml/badge.svg) ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg) ![License: MIT](https://img.shields.io/badge/License-MIT-green.svg) [![M8ven Score](https://m8ven.ai/badge/mcp/sonimaharshi1999/insurance-qa-mcp-server)](https://m8ven.ai/mcp/sonimaharshi1999/insurance-qa-mcp-server)
+
 
 > An MCP (Model Context Protocol) server that gives AI assistants like Claude superpowers for QA automation in insurance domains. Provides 24 tools for test execution, synthetic data generation, code quality analysis, coverage reporting, insurance business-rule validation, Playwright test generation, multi-agent code review, semantic search, chaos testing, mock enterprise connectors (ADO, Zephyr, SQL), and a natural-language QA workflow orchestrator -- integrating 6 external projects as MCP tool bridges.
 
